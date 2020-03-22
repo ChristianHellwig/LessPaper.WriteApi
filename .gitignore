@@ -1,0 +1,22 @@
+## Ignore all files and folders
+*
+!.github/workflows/dotnetcore.yml
+!.github/workflows/dotnetcore_pull_request.yml
+!/**/
+
+# root folder
+!.gitignore
+!LICENSE
+!README.md
+/**/Debug
+/**/Release
+
+## Add specific files
+!LessPaper.WriteService.sln
+!LessPaper.WriteService/LessPaper.WriteService.csproj
+!LessPaper.WriteService.UnitTest/LessPaper.WriteService.UnitTest.csproj
+!/**/*.cs
+
+!LessPaper.WriteService/Properties/launchSettings.json
+!LessPaper.WriteService/appsettings.Development.json
+!LessPaper.WriteService/appsettings.json
