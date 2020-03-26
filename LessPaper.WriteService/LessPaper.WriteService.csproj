@@ -9,7 +9,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="LessPaper.Shared" Version="0.0.6" />
+    <PackageReference Include="LessPaper.Shared" Version="0.0.7" />
+    <PackageReference Include="LessPaper.Shared.Queueing" Version="0.0.1" />
+    <PackageReference Include="Minio" Version="3.1.10" />
+    <PackageReference Include="RabbitMQ.Client" Version="5.1.2" />
   </ItemGroup>
 
 
