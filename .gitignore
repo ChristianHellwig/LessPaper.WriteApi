@@ -14,8 +14,7 @@
 !LessPaper.WriteService.sln
 !LessPaper.WriteService/LessPaper.WriteService.csproj
 !LessPaper.WriteService.UnitTest/LessPaper.WriteService.UnitTest.csproj
-!LessPaper.WriteService.UnitTest/LessPaper.WriteService.IntegrationTest.csproj
-
+!LessPaper.WriteService.IntegrationTest/LessPaper.WriteService.IntegrationTest.csproj
 !LessPaper.WriteService/Properties/launchSettings.json
 !LessPaper.WriteService/appsettings.Development.json
 !LessPaper.WriteService/appsettings.json
