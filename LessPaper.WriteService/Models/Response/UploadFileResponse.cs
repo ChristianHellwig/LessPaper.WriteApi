@@ -6,14 +6,14 @@ namespace LessPaper.WriteService.Models.Response
 {
     public class UploadFileResponse : IUploadMetadata
     {
-        public UploadFileResponse(IUploadMetadata uploadMetadata)
+        public UploadFileResponse(string objectName, string objectId, uint sizeInBytes, DateTime latestChangeDate, DateTime latestViewDate, uint quickNumber)
         {
-            ObjectName = uploadMetadata.ObjectName;
-            ObjectId = uploadMetadata.ObjectId;
-            SizeInByte = uploadMetadata.SizeInByte;
-            QuickNumber = uploadMetadata.QuickNumber;
-            LatestChangeDate = uploadMetadata.LatestChangeDate;
-            LatestViewDate = uploadMetadata.LatestViewDate;
+            ObjectName = objectName;
+            ObjectId = objectId;
+            SizeInBytes = sizeInBytes;
+            LatestChangeDate = latestChangeDate;
+            LatestViewDate = latestViewDate;
+            QuickNumber = quickNumber;
         }
 
         /// <inheritdoc />
@@ -26,7 +26,7 @@ namespace LessPaper.WriteService.Models.Response
 
         /// <inheritdoc />
         [JsonPropertyName("size_in_bytes")]
-        public uint SizeInByte { get; }
+        public uint SizeInBytes { get; }
 
         /// <inheritdoc />
         [JsonPropertyName("latest_change_date")]

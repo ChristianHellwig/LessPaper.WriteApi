@@ -2,7 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LessPaper.Shared.Interfaces.Buckets;
+using LessPaper.Shared.Interfaces.Bucket;
+using LessPaper.Shared.MinIO.Models;
 using LessPaper.WriteService.Models;
 using LessPaper.WriteService.Options;
 using Microsoft.AspNetCore.Builder;
@@ -30,7 +31,7 @@ namespace LessPaper.WriteService
         {
             services.AddOptions();
             services.Configure<AppSettings>(Configuration.GetSection("CustomSettings"));
-            services.AddScoped<IBucket, MinioBucket>();
+            services.AddScoped<IWriteableBucket, MinioBucket>();
             services.AddControllers();
         }
 

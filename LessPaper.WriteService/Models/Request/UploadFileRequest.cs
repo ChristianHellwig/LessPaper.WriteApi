@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using LessPaper.Shared.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,7 +26,7 @@ namespace LessPaper.WriteService.Models.Request
         [Required]
         [JsonPropertyName("document_language")]
         [ModelBinder(Name = "document_language")]
-        public string DocumentLanguage { get; set; }
+        public DocumentLanguage DocumentLanguage { get; set; }
 
         [Required]
         [JsonPropertyName("file")]
