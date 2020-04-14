@@ -2,6 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LessPaper.Shared.Interfaces.Bucket;
+using LessPaper.Shared.MinIO.Models;
+using LessPaper.WriteService.Models;
+using LessPaper.WriteService.Options;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -25,6 +29,9 @@ namespace LessPaper.WriteService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddOptions();
+            services.Configure<AppSettings>(Configuration.GetSection("CustomSettings"));
+            services.AddScoped<IWriteableBucket, MinioBucket>();
             services.AddControllers();
         }
 
