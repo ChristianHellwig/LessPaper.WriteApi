@@ -33,104 +33,104 @@ namespace LessPaper.WriteService.Controllers.v1
         }
 
 
-        ///// <summary>
-        ///// Upload a file to a specific location
-        ///// </summary>
-        ///// <param name="fileData">Form-data of the file</param>
-        ///// <param name="directoryId">Target directory id</param>
-        ///// <param name="revisionNumber">Revision number of the file. Null if the latest version is meant</param>
-        ///// <returns></returns>
-        //[Route("files/{directoryId}")]
-        //[HttpPost]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //public async Task<IActionResult> UploadFile(
-        //    [FromForm] UploadFileRequest fileData,
-        //    [FromRoute] string directoryId,
-        //    [FromQuery(Name = "revisionNr")] uint? revisionNumber)
-        //{
-        //    #region - Input data validation
+        /// <summary>
+        /// Upload a file to a specific location
+        /// </summary>
+        /// <param name="fileData">Form-data of the file</param>
+        /// <param name="directoryId">Target directory id</param>
+        /// <param name="revisionNumber">Revision number of the file. Null if the latest version is meant</param>
+        /// <returns></returns>
+        [Route("files/{directoryId}")]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> UploadFile(
+            [FromForm] UploadFileRequest fileData,
+            [FromRoute] string directoryId,
+            [FromQuery(Name = "revisionNr")] uint? revisionNumber)
+        {
+            #region - Input data validation
 
-        //    if (!IdGenerator.TypeFromId(directoryId, out var typOfId) || typOfId != IdType.Directory)
-        //        return BadRequest();
+            if (!IdGenerator.TypeFromId(directoryId, out var typOfId) || typOfId != IdType.Directory)
+                return BadRequest();
 
-        //    if (fileData.File == null ||
-        //        fileData.File.Length <= 0 ||
-        //        fileData.File.Length > int.MaxValue ||
-        //        fileData.File.Length > config.Value.ValidationRules.MaxFileSizeInBytes ||
-        //        string.IsNullOrWhiteSpace(fileData.Name) ||
-        //        string.IsNullOrWhiteSpace(fileData.EncryptedKey) ||
-        //        string.IsNullOrWhiteSpace(fileData.PlaintextKey))
-        //    {
-        //        return BadRequest();
-        //    }
+            if (fileData.File == null ||
+                fileData.File.Length <= 0 ||
+                fileData.File.Length > int.MaxValue ||
+                fileData.File.Length > config.Value.ValidationRules.MaxFileSizeInBytes ||
+                string.IsNullOrWhiteSpace(fileData.Name) ||
+                string.IsNullOrWhiteSpace(fileData.EncryptedKey) ||
+                string.IsNullOrWhiteSpace(fileData.PlaintextKey))
+            {
+                return BadRequest();
+            }
 
-        //    var fileSize = (int)fileData.File.Length;
+            var fileSize = (int)fileData.File.Length;
 
-        //    var plaintextKeyBytes = Convert.FromBase64String(fileData.PlaintextKey);
-        //    // Make sure the iv is 16 Bytes long and the key has exactly 32 Byte. 
-        //    if (plaintextKeyBytes.Length != 16 +32)
-        //        return BadRequest();
+            var plaintextKeyBytes = Convert.FromBase64String(fileData.PlaintextKey);
+            // Make sure the iv is 16 Bytes long and the key has exactly 32 Byte. 
+            if (plaintextKeyBytes.Length != 16 + 32)
+                return BadRequest();
 
-        //    #endregion
+            #endregion
 
-        //    var fileId = IdGenerator.NewId(IdType.File);
+            var fileId = IdGenerator.NewId(IdType.File);
 
-        //    try
-        //    {
-        //        // Upload file to bucket
-        //        var successful = await bucket.UploadFileEncrypted(
-        //            config.Value.ExternalServices.MinioBucketName,
-        //            fileId,
-        //            fileSize,
-        //            plaintextKeyBytes,
-        //            fileData.File.OpenReadStream());
+            try
+            {
+                // Upload file to bucket
+                var successful = await bucket.UploadFileEncrypted(
+                    config.Value.ExternalServices.MinioBucketName,
+                    fileId,
+                    fileSize,
+                    plaintextKeyBytes,
+                    fileData.File.OpenReadStream());
 
-        //        if (!successful)
-        //            return BadRequest();
+                if (!successful)
+                    return BadRequest();
 
-        //        // Add item to database
-        //        var quickNumber = await guardApi.AddFile(
-        //                                            directoryId, 
-        //                                            fileId, 
-        //                                            fileSize, 
-        //                                            fileData.EncryptedKey, 
-        //                                            DocumentLanguage.German,
-        //                                            ExtensionType.Docx);
-                
+                // Add item to database
+                var quickNumber = await guardApi.AddFile(
+                                                    directoryId,
+                                                    fileId,
+                                                    fileSize,
+                                                    fileData.EncryptedKey,
+                                                    DocumentLanguage.German,
+                                                    ExtensionType.Docx);
 
-        //        // Add item to queue
-        //        var queueRequest = new QueueFileMetadataDto
-        //        {
-        //            FileId = fileId,
-        //            DirectoryId = directoryId,
-        //            DocumentLanguage = fileData.DocumentLanguage,
-        //            EncryptedKey = fileData.EncryptedKey,
-        //            FileName = fileData.Name,
-        //            PlaintextKey = fileData.PlaintextKey
-        //        };
-        //        await queueSender.Send(queueRequest);
-                
 
-        //        // Build response 
-        //        // TODO Remove casts and add uint return values in sub-apis
-        //        var response = new UploadFileResponse(
-        //            queueRequest.FileName,
-        //            fileId, 
-        //            (uint)fileSize, 
-        //            DateTime.UtcNow,
-        //            DateTime.MinValue,
-        //            (uint)quickNumber);
+                // Add item to queue
+                var queueRequest = new QueueFileMetadataDto
+                {
+                    FileId = fileId,
+                    DirectoryId = directoryId,
+                    DocumentLanguage = fileData.DocumentLanguage,
+                    EncryptedKey = fileData.EncryptedKey,
+                    FileName = fileData.Name,
+                    PlaintextKey = fileData.PlaintextKey
+                };
+                await queueSender.Send(queueRequest);
 
-        //        return Ok(response);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        // TODO Remove file if something failed
-        //        Console.Write(e);
-        //        return BadRequest();
-        //    }
-        //}
+
+                // Build response 
+                // TODO Remove casts and add uint return values in sub-apis
+                var response = new UploadFileResponse(
+                    queueRequest.FileName,
+                    fileId,
+                    (uint)fileSize,
+                    DateTime.UtcNow,
+                    DateTime.MinValue,
+                    (uint)quickNumber);
+
+                return Ok(response);
+            }
+            catch (Exception e)
+            {
+                // TODO Remove file if something failed
+                Console.Write(e);
+                return BadRequest();
+            }
+        }
 
         [Route("directories/{directoryId}")]
         [HttpPost]
